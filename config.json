@@ -1,0 +1,7 @@
+{
+  "orbitRadius": 280,
+  "planetSize": 120,
+  "animationSpeed": 1.0,
+  "glowIntensity": 0.9,
+  "labelFont": "Orbitron, sans-serif"
+}

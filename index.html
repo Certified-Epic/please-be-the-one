@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Simplified Warframe Star Chart - Prototype</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<canvas id="starfield"></canvas>
+
+<div id="stage">
+  <img id="center-geom" src="https://files.catbox.moe/8eyie5.png" alt="center" />
+  <div id="planets"></div>
+</div>
+
+<!-- Zoomed planet panel -->
+<div id="panel" class="hidden">
+  <button id="backBtn">⟵ Back</button>
+  <h2 id="planetTitle"></h2>
+  <div id="achievementsContainer"></div>
+</div>
+
+<!-- Admin UI -->
+<div id="admin">
+  <button id="adminToggle">Admin</button>
+  <div id="adminPanel" class="hidden">
+    <input id="adminPass" placeholder="Enter password" type="password"/>
+    <button id="adminLogin">Open Editor</button>
+    <div id="editor" class="hidden">
+      <textarea id="jsonEditor"></textarea>
+      <div class="adminActions">
+        <button id="saveJson">Save to local (localStorage)</button>
+        <button id="downloadJson">Download JSON</button>
+        <button id="bulkUnlock">Bulk Unlock Tier 1</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

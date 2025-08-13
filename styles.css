@@ -1,0 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+:root{
+  --bg:#04040a;
+  --white:rgba(255,255,255,0.98);
+  --muted:rgba(255,255,255,0.06);
+  --glow: 0 0 18px rgba(255,255,255,0.12), 0 0 55px rgba(255,255,255,0.04);
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--bg);font-family:Orbitron, sans-serif;color:var(--white);overflow:hidden}
+#starfield{position:fixed;inset:0;z-index:0}
+#stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:2;pointer-events:none}
+#center-geom{width:180px;height:180px;pointer-events:none;filter:drop-shadow(0 0 12px rgba(255,255,255,0.06));}
+#planets{position:relative;width:1000px;height:700px;pointer-events:auto}
+.planet{
+  position:absolute;width:120px;height:120px;border-radius:50%;
+  box-shadow:var(--glow);background:transparent;border:2px solid rgba(255,255,255,0.18);
+  display:flex;align-items:center;justify-content:center;overflow:visible;
+  transform-origin: center center;
+}
+.planet .rings{position:absolute;inset:-18px;border-radius:50%;pointer-events:none}
+.orb{position:absolute;inset:-8px;border-radius:50%;border:2px solid rgba(255,255,255,0.06);box-shadow:0 0 6px rgba(255,255,255,0.03);opacity:0.9}
+.planet img.planetImg{width:86px;height:86px;border-radius:50%;}
+.planet .label{position:absolute;bottom:-28px;left:50%;transform:translateX(-50%);font-size:14px;opacity:0.9}
+.planet:hover .label{opacity:1}
+
+#panel{position:fixed;right:24px;top:24px;width:420px;background:rgba(10,10,14,0.7);backdrop-filter:blur(6px);border-radius:8px;padding:12px;z-index:10;box-shadow:0 10px 40px rgba(0,0,0,0.6)}
+#panel.hidden{display:none}
+#achievementsContainer{max-height:60vh;overflow:auto;padding-top:8px;display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.node{
+  background:rgba(255,255,255,0.04);padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);position:relative;
+  display:flex;gap:8px;align-items:center;
+}
+.node .icon{width:44px;height:44px;border-radius:6px;background:rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:center}
+.node.locked{opacity:0.5}
+.node.available{animation:heartbeat 1.6s infinite}
+@keyframes heartbeat{
+  0%{transform:scale(1)}
+  40%{transform:scale(1.06)}
+  100%{transform:scale(1)}
+}
+
+#admin{position:fixed;left:16px;bottom:16px;z-index:20}
+#adminPanel{background:rgba(255,255,255,0.03);padding:8px;border-radius:8px}
+#adminPanel.hidden{display:none}
+#jsonEditor{width:520px;height:320px;background:#010114;color:var(--white);border-radius:6px;padding:8px;border:1px solid rgba(255,255,255,0.06);font-family:monospace}
+button{background:transparent;border:1px solid rgba(255,255,255,0.08);color:var(--white);padding:6px 10px;border-radius:6px;cursor:pointer}
+button:hover{border-color:rgba(255,255,255,0.18)}
+.backdropPulse{position:absolute;inset:-30px;border-radius:999px;box-shadow:0 0 40px rgba(255,255,255,0.04);opacity:0.8;pointer-events:none}
+
+@media (max-width:900px){
+  #panel{width:88%;left:6%;right:6%;top:auto;bottom:16px}
+  #jsonEditor{width:88%}
+}
