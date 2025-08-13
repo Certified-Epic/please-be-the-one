@@ -11,6 +11,103 @@ class WarframeStarChart {
         this.currentZoom = null;
         this.audioEnabled = false;
         this.adminPassword = 'warframe2025';
+        this.userLogin = 'Certified-Epic'; // Store user login
+        this.completedAchievements = this.loadProgress();
+        
+        this.init();
+    }
+    
+    getCurrentUTCDateTime() {
+        const now = new Date();
+        return now.toISOString().slice(0, 19).replace('T', ' ');
+    }
+
+    async init() {
+        await this.loadConfig();
+        await this.loadAchievements();
+        this.setupAudio();
+        this.setupEventListeners();
+        this.createPlanets();
+        this.startDataPulses();
+        this.enableBackgroundMusic();
+        this.renderAchievements();
+        this.updateTimeDisplay();
+    }
+
+    updateTimeDisplay() {
+        // Create or update time display element
+        let timeDisplay = document.getElementById('time-display');
+        if (!timeDisplay) {
+            timeDisplay = document.createElement('div');
+            timeDisplay.id = 'time-display';
+            document.getElementById('star-chart').appendChild(timeDisplay);
+        }
+        
+        // Update time every second
+        setInterval(() => {
+            timeDisplay.innerHTML = `
+                <div class="time-user-info">
+                    <div>UTC: ${this.getCurrentUTCDateTime()}</div>
+                    <div>User: ${this.userLogin}</div>
+                </div>
+            `;
+        }, 1000);
+    }
+
+    completeAchievement(planetId, achievementId) {
+        const achievement = this.findAchievement(planetId, achievementId);
+        if (achievement && achievement.status === 'available') {
+            achievement.status = 'completed';
+            achievement.dateCompleted = this.getCurrentUTCDateTime();
+            achievement.completedBy = this.userLogin; // Track who completed it
+            this.completedAchievements[achievementId] = {
+                dateCompleted: achievement.dateCompleted,
+                completedBy: this.userLogin
+            };
+            this.saveProgress();
+            this.renderAchievements();
+            return true;
+        }
+        return false;
+    }
+
+    loadProgress() {
+        const saved = localStorage.getItem('achievements-progress');
+        return saved ? JSON.parse(saved) : {};
+    }
+
+    updateAchievementStates() {
+        for (const planetName in this.achievements) {
+            const planet = this.achievements[planetName];
+            for (const tierId in planet.tiers) {
+                const tier = planet.tiers[tierId];
+                for (const topicName in tier.topics) {
+                    const topic = tier.topics[topicName];
+                    topic.achievements.forEach(achievement => {
+                        if (this.completedAchievements[achievement.id]) {
+                            achievement.status = 'completed';
+                            achievement.dateCompleted = this.completedAchievements[achievement.id].dateCompleted;
+                            achievement.completedBy = this.completedAchievements[achievement.id].completedBy;
+                        }
+                    });
+                }
+            }
+        }
+    }
+}
+class WarframeStarChart {
+    constructor() {
+        this.config = {
+            orbitRadius: 300,
+            planetSize: 80,
+            animationSpeed: 1,
+            glowIntensity: 1
+        };
+        
+        this.achievements = {};
+        this.currentZoom = null;
+        this.audioEnabled = false;
+        this.adminPassword = 'warframe2025';
         
         this.init();
     }
@@ -732,6 +829,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Failed to load saved achievements');
         }
     }
+
     
     new WarframeStarChart();
 });
