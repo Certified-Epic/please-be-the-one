@@ -1,53 +1,558 @@
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
-:root{
-  --bg:#04040a;
-  --white:rgba(255,255,255,0.98);
-  --muted:rgba(255,255,255,0.06);
-  --glow: 0 0 18px rgba(255,255,255,0.12), 0 0 55px rgba(255,255,255,0.04);
-}
-*{box-sizing:border-box}
-html,body{height:100%;margin:0;background:var(--bg);font-family:Orbitron, sans-serif;color:var(--white);overflow:hidden}
-#starfield{position:fixed;inset:0;z-index:0}
-#stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:2;pointer-events:none}
-#center-geom{width:180px;height:180px;pointer-events:none;filter:drop-shadow(0 0 12px rgba(255,255,255,0.06));}
-#planets{position:relative;width:1000px;height:700px;pointer-events:auto}
-.planet{
-  position:absolute;width:120px;height:120px;border-radius:50%;
-  box-shadow:var(--glow);background:transparent;border:2px solid rgba(255,255,255,0.18);
-  display:flex;align-items:center;justify-content:center;overflow:visible;
-  transform-origin: center center;
-}
-.planet .rings{position:absolute;inset:-18px;border-radius:50%;pointer-events:none}
-.orb{position:absolute;inset:-8px;border-radius:50%;border:2px solid rgba(255,255,255,0.06);box-shadow:0 0 6px rgba(255,255,255,0.03);opacity:0.9}
-.planet img.planetImg{width:86px;height:86px;border-radius:50%;}
-.planet .label{position:absolute;bottom:-28px;left:50%;transform:translateX(-50%);font-size:14px;opacity:0.9}
-.planet:hover .label{opacity:1}
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
 
-#panel{position:fixed;right:24px;top:24px;width:420px;background:rgba(10,10,14,0.7);backdrop-filter:blur(6px);border-radius:8px;padding:12px;z-index:10;box-shadow:0 10px 40px rgba(0,0,0,0.6)}
-#panel.hidden{display:none}
-#achievementsContainer{max-height:60vh;overflow:auto;padding-top:8px;display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.node{
-  background:rgba(255,255,255,0.04);padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);position:relative;
-  display:flex;gap:8px;align-items:center;
-}
-.node .icon{width:44px;height:44px;border-radius:6px;background:rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:center}
-.node.locked{opacity:0.5}
-.node.available{animation:heartbeat 1.6s infinite}
-@keyframes heartbeat{
-  0%{transform:scale(1)}
-  40%{transform:scale(1.06)}
-  100%{transform:scale(1)}
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-#admin{position:fixed;left:16px;bottom:16px;z-index:20}
-#adminPanel{background:rgba(255,255,255,0.03);padding:8px;border-radius:8px}
-#adminPanel.hidden{display:none}
-#jsonEditor{width:520px;height:320px;background:#010114;color:var(--white);border-radius:6px;padding:8px;border:1px solid rgba(255,255,255,0.06);font-family:monospace}
-button{background:transparent;border:1px solid rgba(255,255,255,0.08);color:var(--white);padding:6px 10px;border-radius:6px;cursor:pointer}
-button:hover{border-color:rgba(255,255,255,0.18)}
-.backdropPulse{position:absolute;inset:-30px;border-radius:999px;box-shadow:0 0 40px rgba(255,255,255,0.04);opacity:0.8;pointer-events:none}
+body {
+    background: #0a0a0a;
+    font-family: 'Orbitron', monospace;
+    color: #ffffff;
+    overflow: hidden;
+    cursor: crosshair;
+}
 
-@media (max-width:900px){
-  #panel{width:88%;left:6%;right:6%;top:auto;bottom:16px}
-  #jsonEditor{width:88%}
+/* Starfield background */
+#starfield {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(circle at 25% 25%, #1a1a2e 0%, #0a0a0a 50%);
+    z-index: -1;
+}
+
+#starfield::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(2px 2px at 20px 30px, #ffffff, transparent),
+        radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
+        radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.6), transparent),
+        radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.4), transparent),
+        radial-gradient(2px 2px at 160px 30px, rgba(255,255,255,0.7), transparent);
+    background-repeat: repeat;
+    background-size: 200px 100px;
+    animation: twinkle 3s ease-in-out infinite alternate;
+}
+
+@keyframes twinkle {
+    0% { opacity: 0.3; }
+    100% { opacity: 0.8; }
+}
+
+/* Main star chart container */
+#star-chart {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform-origin: center center;
+}
+
+/* Central geometric image */
+#central-image {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 120px;
+    height: 120px;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+}
+
+#central-image img {
+    width: 100%;
+    height: 100%;
+    filter: brightness(1.2) drop-shadow(0 0 20px rgba(255, 255, 255, 0.5));
+}
+
+.data-transfer-lines {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 200px;
+    height: 200px;
+    transform: translate(-50%, -50%);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    animation: pulse-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes pulse-glow {
+    0% { 
+        opacity: 0.3;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    }
+    100% { 
+        opacity: 0.7;
+        box-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+    }
+}
+
+/* Planets container */
+#planets-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* Planet styling */
+.planet {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 5;
+}
+
+.planet img {
+    width: 100%;
+    height: 100%;
+    filter: brightness(1.1) drop-shadow(0 0 15px rgba(255, 255, 255, 0.4));
+}
+
+.planet .orbital-rings {
+    position: absolute;
+    top: -15px;
+    left: -15px;
+    width: 110px;
+    height: 110px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.planet .orbital-rings::after {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    width: 130px;
+    height: 130px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+}
+
+.planet:hover .orbital-rings {
+    animation: orbital-pulse 1s ease-in-out infinite alternate;
+}
+
+.planet:hover .hover-rings {
+    opacity: 1;
+}
+
+.hover-rings {
+    position: absolute;
+    top: -25px;
+    left: -25px;
+    width: 130px;
+    height: 130px;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    animation: fade-rings 2s ease-in-out infinite;
+}
+
+.hover-rings::after {
+    content: '';
+    position: absolute;
+    top: -15px;
+    left: -15px;
+    width: 160px;
+    height: 160px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    animation: fade-rings 2s ease-in-out infinite 0.5s;
+}
+
+@keyframes fade-rings {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 1; }
+}
+
+@keyframes orbital-pulse {
+    0% { 
+        border-color: rgba(255, 255, 255, 0.2);
+        box-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
+    }
+    100% { 
+        border-color: rgba(255, 255, 255, 0.6);
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* Planet labels */
+.planet-label {
+    position: absolute;
+    top: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.planet.zoomed .planet-label,
+#star-chart.zoomed .planet-label {
+    opacity: 1;
+}
+
+/* Achievement nodes */
+.achievement-node {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 15;
+}
+
+.achievement-node img {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
+}
+
+.achievement-node.available {
+    animation: heartbeat 2s ease-in-out infinite;
+}
+
+.achievement-node.available .heartbeat-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('assets/heartbeat.png');
+    background-size: cover;
+    opacity: 0.8;
+    animation: heartbeat-glow 2s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+@keyframes heartbeat-glow {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.8; }
+}
+
+.achievement-node.locked img {
+    filter: grayscale(100%) brightness(0.5);
+}
+
+.achievement-node:hover {
+    transform: scale(1.2);
+    z-index: 20;
+}
+
+/* Junction nodes */
+.junction-node {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 15;
+}
+
+.junction-node img {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5));
+}
+
+.junction-node.unlocked {
+    animation: junction-glow 1.5s ease-in-out infinite alternate;
+}
+
+.junction-node.unlocked::after {
+    content: '→';
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 16px;
+    animation: arrow-pulse 1s ease-in-out infinite;
+}
+
+@keyframes junction-glow {
+    0% { filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5)); }
+    100% { filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.8)); }
+}
+
+@keyframes arrow-pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+/* Branches and paths */
+.branch-path {
+    position: absolute;
+    stroke: rgba(255, 255, 255, 0.4);
+    stroke-width: 2;
+    fill: none;
+    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.2));
+    z-index: 1;
+}
+
+.data-pulse {
+    r: 3;
+    fill: rgba(255, 255, 255, 0.8);
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.6));
+}
+
+/* Modal styles */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: linear-gradient(135deg, rgba(20, 20, 30, 0.95), rgba(10, 10, 15, 0.95));
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    padding: 20px;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.projector-style {
+    position: relative;
+    overflow: hidden;
+}
+
+.projector-style::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    animation: projector-scan 2s linear infinite;
+}
+
+@keyframes projector-scan {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: 10px;
+}
+
+.modal-header h3 {
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+#modal-close {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 24px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+#modal-close:hover {
+    color: #ffffff;
+}
+
+.modal-body p {
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.complete-button {
+    background: linear-gradient(45deg, rgba(0, 150, 255, 0.8), rgba(0, 100, 200, 0.8));
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Orbitron', monospace;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.complete-button:hover {
+    background: linear-gradient(45deg, rgba(0, 170, 255, 1), rgba(0, 120, 220, 1));
+    box-shadow: 0 0 15px rgba(0, 150, 255, 0.5);
+}
+
+.complete-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Admin panel */
+.admin-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 18px;
+    z-index: 100;
+    transition: all 0.3s ease;
+}
+
+.admin-toggle:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.admin-panel {
+    position: fixed;
+    top: 70px;
+    right: 20px;
+    width: 300px;
+    background: rgba(10, 10, 15, 0.95);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    padding: 20px;
+    z-index: 200;
+    backdrop-filter: blur(10px);
+}
+
+.admin-panel.hidden {
+    display: none;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: 10px;
+}
+
+.admin-content input,
+.admin-content select,
+.admin-content button {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+    border-radius: 3px;
+    font-family: 'Orbitron', monospace;
+}
+
+.admin-content button {
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.admin-content button:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Planet label display */
+#planet-label {
+    position: fixed;
+    top: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 24px;
+    font-weight: 900;
+    color: #ffffff;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+    z-index: 50;
+    transition: opacity 0.3s ease;
+}
+
+#planet-label.hidden {
+    opacity: 0;
+}
+
+/* Zoom states */
+#star-chart.zoomed {
+    transform: scale(2) translate(0, 0);
+}
+
+.planet.zoomed {
+    z-index: 100;
+}
+
+.planet.zoomed .achievement-node,
+.planet.zoomed .junction-node {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.planet:not(.zoomed) .achievement-node,
+.planet:not(.zoomed) .junction-node {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .planet {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .achievement-node,
+    .junction-node {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 15px;
+    }
+    
+    #planet-label {
+        font-size: 20px;
+    }
 }
