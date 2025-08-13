@@ -1,43 +1,82 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Simplified Warframe Star Chart - Prototype</title>
-<link rel="stylesheet" href="styles.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warframe Star Chart</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<canvas id="starfield"></canvas>
-
-<div id="stage">
-  <img id="center-geom" src="https://files.catbox.moe/8eyie5.png" alt="center" />
-  <div id="planets"></div>
-</div>
-
-<!-- Zoomed planet panel -->
-<div id="panel" class="hidden">
-  <button id="backBtn">⟵ Back</button>
-  <h2 id="planetTitle"></h2>
-  <div id="achievementsContainer"></div>
-</div>
-
-<!-- Admin UI -->
-<div id="admin">
-  <button id="adminToggle">Admin</button>
-  <div id="adminPanel" class="hidden">
-    <input id="adminPass" placeholder="Enter password" type="password"/>
-    <button id="adminLogin">Open Editor</button>
-    <div id="editor" class="hidden">
-      <textarea id="jsonEditor"></textarea>
-      <div class="adminActions">
-        <button id="saveJson">Save to local (localStorage)</button>
-        <button id="downloadJson">Download JSON</button>
-        <button id="bulkUnlock">Bulk Unlock Tier 1</button>
-      </div>
+    <!-- Background starfield -->
+    <div id="starfield"></div>
+    
+    <!-- Main canvas container -->
+    <div id="star-chart">
+        <!-- Central geometric image -->
+        <div id="central-image">
+            <img src="assets/central.png" alt="Central Hub">
+            <div class="data-transfer-lines"></div>
+        </div>
+        
+        <!-- Planets container -->
+        <div id="planets-container">
+            <!-- Core planets will be generated here -->
+        </div>
+        
+        <!-- Achievement details modal -->
+        <div id="achievement-modal" class="modal hidden">
+            <div class="modal-content projector-style">
+                <div class="modal-header">
+                    <h3 id="modal-title"></h3>
+                    <button id="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p id="modal-description"></p>
+                    <div class="modal-actions">
+                        <button id="complete-btn" class="complete-button">Complete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Planet label -->
+        <div id="planet-label" class="hidden"></div>
+        
+        <!-- Admin panel toggle -->
+        <button id="admin-toggle" class="admin-toggle">⚙️</button>
+        
+        <!-- Admin panel -->
+        <div id="admin-panel" class="admin-panel hidden">
+            <div class="admin-header">
+                <h3>Admin Panel</h3>
+                <button id="admin-close">&times;</button>
+            </div>
+            <div class="admin-content">
+                <input type="password" id="admin-password" placeholder="Enter password">
+                <button id="admin-login">Login</button>
+                <div id="admin-controls" class="hidden">
+                    <button id="bulk-unlock">Unlock All</button>
+                    <button id="bulk-reset">Reset All</button>
+                    <button id="download-json">Download JSON</button>
+                    <div class="achievement-editor">
+                        <h4>Edit Achievements</h4>
+                        <select id="planet-select"></select>
+                        <select id="tier-select"></select>
+                        <div id="achievements-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
-
-<script src="app.js"></script>
+    
+    <!-- Audio elements -->
+    <audio id="bg-music" loop>
+        <source src="assets/bg-music.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="hover-sound">
+        <source src="assets/hover.mp3" type="audio/mpeg">
+    </audio>
+    
+    <script src="script.js"></script>
 </body>
 </html>
