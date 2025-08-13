@@ -1,7 +1,21 @@
 {
-  "orbitRadius": 280,
-  "planetSize": 120,
-  "animationSpeed": 1.0,
-  "glowIntensity": 0.9,
-  "labelFont": "Orbitron, sans-serif"
+    "orbitRadius": 300,
+    "planetSize": 80,
+    "animationSpeed": 1,
+    "glowIntensity": 1,
+    "colors": {
+        "primary": "#ffffff",
+        "secondary": "rgba(255, 255, 255, 0.6)",
+        "background": "#0a0a0a",
+        "glow": "rgba(255, 255, 255, 0.3)"
+    },
+    "audio": {
+        "backgroundVolume": 0.3,
+        "effectVolume": 0.5
+    },
+    "ui": {
+        "zoomSpeed": 0.8,
+        "fadeSpeed": 0.3,
+        "pulseSpeed": 2
+    }
 }
